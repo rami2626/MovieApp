@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.example.moviesApp.appSections.moviesListScreen.presntation.ui.comman.LoadingIndecatorView
+import com.example.moviesApp.appSections.moviesListScreen.presntation.ui.comman.LoadingIndicatorView
 import com.example.moviesApp.appSections.moviesListScreen.presntation.ui.comman.Toolbar
 import com.example.moviesApp.appSections.moviesListScreen.presntation.ui.viewModel.MoviesViewModel
 import com.example.moviesApp.theme.gray_light_2
@@ -55,7 +55,7 @@ fun HomeScreen(
             }
             item {
                 if (sharedState.isLoading) {
-                    LoadingIndecatorView()
+                    LoadingIndicatorView()
                 }
             }
         }

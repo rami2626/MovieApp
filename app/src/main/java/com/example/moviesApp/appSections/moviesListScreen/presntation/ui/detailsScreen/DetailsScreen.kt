@@ -19,7 +19,6 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,9 +27,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.example.moviesApp.appSections.moviesListScreen.presntation.ui.comman.LoadingIndecatorView
+import com.example.moviesApp.appSections.moviesListScreen.presntation.ui.comman.LoadingIndicatorView
 import com.example.moviesApp.appSections.moviesListScreen.presntation.ui.comman.Toolbar
 import com.example.moviesApp.appSections.moviesListScreen.presntation.ui.viewModel.MoviesViewModel
 import com.example.moviesApp.theme.*
@@ -41,7 +41,7 @@ fun DetailsScreen(
     viewModel: MoviesViewModel,
     navController: NavHostController,
 ) {
-    val state by viewModel.movieDetailsSates.collectAsState()
+    val state by viewModel.movieDetailsSates.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
     Box(
@@ -57,7 +57,7 @@ fun DetailsScreen(
             Toolbar(navController = navController, hasBackNavigation = true)
             if (state.isLoading) {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    LoadingIndecatorView()
+                    LoadingIndicatorView()
                 }
             } else {
                 Column(
@@ -72,7 +72,7 @@ fun DetailsScreen(
 
                     ) {
                         AsyncImage(
-                            model = "https://image.tmdb.org/t/p/original/kjQBrc00fB2RjHZB3PGR4w9ibpz.jpg",
+                            model = state.item?.photoUrl,
                             contentDescription = "The delasign logo",
                             contentScale = ContentScale.FillWidth,
                         )
@@ -80,7 +80,7 @@ fun DetailsScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        text = state.title ?: "",
+                        text = state.item?.title ?: "",
                         fontSize = 24.sp,
                         color = Color.White,
                         maxLines = 3,
@@ -93,7 +93,7 @@ fun DetailsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "(${state.publishedAt})",
+                            text = "(${state.item?.publishedAt})",
                             fontSize = 16.sp,
                             color = Color.White
                         )
@@ -106,12 +106,10 @@ fun DetailsScreen(
                         )
                         Spacer(modifier = Modifier.width(2.dp))
                         Text(
-                            text = (state.rate ?: 0.0).toString(),
+                            text = (state.item?.rate ?: 0.0).toString(),
                             fontSize = 16.sp,
                             color = Color.White
                         )
-
-
                     }
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
@@ -121,13 +119,19 @@ fun DetailsScreen(
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
                     Text(
-                        text = state.description ?: "",
+                        text = state.item?.description ?: "",
                         fontSize = 20.sp,
                         color = Color.White,
                         modifier = Modifier.padding(16.dp)
                     )
                 }
             }
+        }
+        state.error?.let { error ->
+            Text(
+                text = error,
+                color = Color.Red,
+            )
         }
     }
 

@@ -89,8 +89,6 @@ fun MovieCard(item: Movie, onItemClicked: (String) -> Unit) {
                     Text(text = item.rate.toString(), fontSize = 14.sp, color = Color.White)
                 }
             }
-
         }
     }
-
 }

@@ -2,14 +2,16 @@ package com.example.moviesApp.appSections.moviesListScreen.presntation.ui.viewMo
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.moviesApp.appSections.moviesListScreen.domain.entity.Movie
 import com.example.moviesApp.appSections.moviesListScreen.domain.useCases.GetMovieUseCaseInterface
+import com.example.moviesApp.appSections.moviesListScreen.presntation.ui.detailsScreen.DetailsScreenState
+import com.example.moviesApp.appSections.moviesListScreen.presntation.ui.HomeScreen.HomeScreenState
 import com.example.moviesApp.util.DefaultPaginator
 import com.example.moviesApp.networking.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,8 +20,8 @@ import javax.inject.Inject
 class MoviesViewModel @Inject constructor(
     private val getMovieUseCase: GetMovieUseCaseInterface
 ) : ViewModel() {
-    private val _moviesSates = MutableStateFlow(ScreenState())
-    val moviesState: StateFlow<ScreenState> = _moviesSates.asStateFlow()
+    private val _moviesSates = MutableStateFlow(HomeScreenState())
+    val moviesState: StateFlow<HomeScreenState> = _moviesSates.asStateFlow()
 
     private val _movieDetailsSates = MutableStateFlow(DetailsScreenState())
     val movieDetailsSates: StateFlow<DetailsScreenState> = _movieDetailsSates.asStateFlow()
@@ -43,7 +45,6 @@ class MoviesViewModel @Inject constructor(
                 )
             }
             _moviesSates.value.page
-
         },
         onError = { message ->
             _moviesSates.update {
@@ -73,49 +74,50 @@ class MoviesViewModel @Inject constructor(
         }
     }
 
-    suspend fun  loadMovieDetails(movieId: Int) {
+    suspend fun loadMovieDetails(movieId: Int) {
+        _movieDetailsSates.update {
+            it.copy(
+                isLoading = true,
+                error = null
+            )
+        }
 
-            getMovieUseCase.getMovieDetails(movieId).collect {
-                when (it) {
-                    is Resource.Success -> {
-                        _movieDetailsSates.update { state ->
-                            state.copy(id = state.id, title = state.title, isLoading = false)
-                        }
+        getMovieUseCase.getMovieDetails(movieId).catch {
+            _movieDetailsSates.update {
+                it.copy(
+                    item = null,
+                    isLoading = false,
+                    error = it.error
+                )
+            }
+
+        }.collect {
+            when (it) {
+                is Resource.Error -> {
+                    _movieDetailsSates.update { state ->
+                        state.copy(
+                            item = null,
+                            isLoading = false,
+                            error = it.message
+                        )
                     }
+                }
 
-                    is Resource.Error -> {
-                        _movieDetailsSates.update { state ->
-                            state.copy(error = state.error,isLoading = false)
-                        }
+                is Resource.Loading -> {
+                    _movieDetailsSates.update { state ->
+                        state.copy(isLoading = true, error = null, item = null)
                     }
+                }
 
-                    is Resource.Loading -> {
-
-                        _movieDetailsSates.update { state ->
-                            state.copy(isLoading = true)
-                        }
+                is Resource.Success -> {
+                    _movieDetailsSates.update { state ->
+                        state.copy(item = it.data, isLoading = false, error = null)
                     }
-
+                }
             }
         }
     }
 }
 
-data class ScreenState(
-    val isLoading: Boolean = false,
-    val items: List<Movie> = emptyList(),
-    val error: String? = null,
-    val endReached: Boolean = false,
-    val page: Int = 1
-)
 
-data class DetailsScreenState(
-    val isLoading: Boolean = true,
-    val id: Int? = 0,
-    val title: String? = "",
-    val photoUrl: String? = "",
-    val publishedAt: String? = "",
-    val description: String? = "",
-    val rate: Double? = 0.0,
-    val error: String? = null,
-)
+

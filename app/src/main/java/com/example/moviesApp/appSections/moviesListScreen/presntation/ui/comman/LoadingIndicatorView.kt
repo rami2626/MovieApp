@@ -11,9 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.moviesApp.theme.yellow_dark
 
-
 @Composable
-fun LoadingIndecatorView() {
+fun LoadingIndicatorView() {
     Box {
         Row(
             modifier = Modifier

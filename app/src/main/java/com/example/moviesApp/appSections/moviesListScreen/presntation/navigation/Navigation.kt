@@ -21,7 +21,10 @@ fun Navigation() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Navigator.MainGroup.route) {
 
-        navigation(startDestination = Navigator.MainScreen.route, route = Navigator.MainGroup.route) {
+        navigation(
+            startDestination = Navigator.MainScreen.route,
+            route = Navigator.MainGroup.route
+        ) {
 
             composable(route = Navigator.MainScreen.route) {
                 val viewModel = it.sharedViewModel<MoviesViewModel>(navController = navController)
@@ -50,9 +53,14 @@ fun Navigation() {
                 val movieId = args?.getString("movieId") ?: ""
                 val viewModel =
                     entry.sharedViewModel<MoviesViewModel>(navController = navController)
+
                 DetailsScreen(
-                    movieId = movieId, viewModel = viewModel, navController = navController
+                    movieId = movieId,
+                    viewModel = viewModel,
+
+                    navController = navController
                 )
+
             }
         }
 

@@ -1,9 +1,9 @@
 package com.example.moviesApp.appSections.moviesListScreen.data.dataSources
 
-import com.example.moviesApp.appSections.moviesListScreen.data.model.MovieDto
+import com.example.moviesApp.appSections.moviesListScreen.data.model.MovieDetailsDto
 import com.example.moviesApp.appSections.moviesListScreen.data.model.MovieModelDto
+import com.example.moviesApp.networking.Resource
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import retrofit2.Retrofit
 import javax.inject.Inject
 import retrofit2.http.GET
@@ -19,7 +19,7 @@ interface GetMovieApi {
     @GET("/3/movie/{id}?api_key=594511549fb79caa0585e0097ca41aa9")
     suspend fun getMovieDetails(
         @Path("id") id: Int
-    ): Flow<MovieDto>
+    ): MovieDetailsDto
 }
 
 interface MovieDataSourceInterface {
@@ -29,7 +29,7 @@ interface MovieDataSourceInterface {
 
     suspend fun getMovieDetails(
         movieId: Int
-    ): Flow<MovieDto>
+    ):MovieDetailsDto
 }
 
 class MovieDataSource @Inject constructor(retrofit: Retrofit) :
@@ -40,7 +40,7 @@ class MovieDataSource @Inject constructor(retrofit: Retrofit) :
         return api.getMovies(page)
     }
 
-    override suspend fun getMovieDetails(id: Int): Flow<MovieDto> = flow {
-        api.getMovieDetails(id)
+    override suspend fun getMovieDetails(id: Int): MovieDetailsDto{
+       return  api.getMovieDetails(id)
     }
 }

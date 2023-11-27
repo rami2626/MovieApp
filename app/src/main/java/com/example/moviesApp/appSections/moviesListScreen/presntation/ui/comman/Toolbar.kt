@@ -28,7 +28,6 @@ fun Toolbar(
                 color = Color.White,
                 textAlign = TextAlign.Center
             )
-
         },
         navigationIcon = {
             if (hasBackNavigation == true) {
@@ -41,7 +40,6 @@ fun Toolbar(
                 }
             }
         },
-
         backgroundColor = gray_light_2,
         elevation = 0.dp
     )
